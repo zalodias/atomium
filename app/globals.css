@@ -1,26 +1,88 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+body {
+  line-height: calc(1em + 8px);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  --background-neutral-default: hsl(0 0% 96%);
+  --background-neutral-strong: hsl(0 0% 80%);
+  --background-neutral-subtle: hsl(0 0% 88%);
+  --background-neutral-faded: hsl(0 0% 92%);
+  --background-neutral-inverse: hsl(0 0% 4%);
+
+  --foreground-neutral-default: hsl(0 0% 4%);
+  --foreground-neutral-strong: hsl(0 0% 8%);
+  --foreground-neutral-subtle: hsl(0 0% 12%);
+  --foreground-neutral-faded: hsl(0 0% 16%);
+  --foreground-neutral-inverse: hsl(0 0% 96%);
+
+  --border-neutral-default: hsl(0 0% 80%);
+  --border-neutral-strong: hsl(0 0% 64%);
+  --border-neutral-subtle: hsl(0 0% 88%);
+  --border-neutral-faded: hsl(0 0% 92%);
+  --border-neutral-inverse: hsl(0 0% 4%);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background-neutral-default: hsl(0 0% 8%);
+    --background-neutral-strong: hsl(0 0% 20%);
+    --background-neutral-subtle: hsl(0 0% 16%);
+    --background-neutral-faded: hsl(0 0% 12%);
+    --background-neutral-inverse: hsl(0 0% 96%);
+
+    --foreground-neutral-default: hsl(0 0% 96%);
+    --foreground-neutral-strong: hsl(0 0% 92%);
+    --foreground-neutral-subtle: hsl(0 0% 88%);
+    --foreground-neutral-faded: hsl(0 0% 64%);
+    --foreground-neutral-inverse: hsl(0 0% 4%);
+
+    --border-neutral-default: hsl(0 0% 32%);
+    --border-neutral-strong: hsl(0 0% 48%);
+    --border-neutral-subtle: hsl(0 0% 16%);
+    --border-neutral-faded: hsl(0 0% 12%);
+    --border-neutral-inverse: hsl(0 0% 96%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@theme inline {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 640px;
+  --breakpoint-lg: 960px;
+  --breakpoint-xl: 1280px;
+
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-background-neutral-default: var(--background-neutral-default);
+  --color-background-neutral-strong: var(--background-neutral-strong);
+  --color-background-neutral-subtle: var(--background-neutral-subtle);
+  --color-background-neutral-faded: var(--background-neutral-faded);
+  --color-background-neutral-inverse: var(--background-neutral-inverse);
+  --color-foreground-neutral-default: var(--foreground-neutral-default);
+  --color-foreground-neutral-strong: var(--foreground-neutral-strong);
+  --color-foreground-neutral-subtle: var(--foreground-neutral-subtle);
+  --color-foreground-neutral-faded: var(--foreground-neutral-faded);
+  --color-foreground-neutral-inverse: var(--foreground-neutral-inverse);
+  --color-border-neutral-default: var(--border-neutral-default);
+  --color-border-neutral-strong: var(--border-neutral-strong);
+  --color-border-neutral-subtle: var(--border-neutral-subtle);
+  --color-border-neutral-faded: var(--border-neutral-faded);
+  --color-border-neutral-inverse: var(--border-neutral-inverse);
+
+  --font-*: initial;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --text-*: initial;
+  --text-body-small: 12px;
+  --text-body-medium: 14px;
+  --text-body-large: 16px;
+  --text-title-small: 18px;
+  --text-title-medium: 20px;
+  --text-title-large: 24px;
+  --text-display-small: 32px;
+  --text-display-medium: 40px;
+  --text-display-large: 48px;
 }
