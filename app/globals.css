@@ -72,9 +72,6 @@ body {
   --color-border-neutral-inverse: var(--border-neutral-inverse);
 
   --font-*: initial;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-
   --text-*: initial;
   --text-body-small: 12px;
   --text-body-medium: 14px;
