@@ -83,6 +83,9 @@ body {
   --text-title-medium: 20px;
   --text-title-large: 24px;
   --text-display-small: 32px;
+  --text-display-small--letter-spacing: -0.01em;
   --text-display-medium: 40px;
+  --text-display-medium--letter-spacing: -0.02em;
   --text-display-large: 48px;
+  --text-display-large--letter-spacing: -0.03em;
 }
