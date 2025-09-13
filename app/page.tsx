@@ -13,13 +13,13 @@ export default function Home() {
       </div>
       <div className="flex w-full flex-col gap-4">
         <Link
-          href="/lobby/join"
+          href="/lobby/create"
           className="bg-background-neutral-inverse text-foreground-neutral-inverse text-title-small inline-flex w-full items-center justify-center rounded-full border px-6 py-4 font-medium transition-transform active:scale-95"
         >
           Criar jogo
         </Link>
         <Link
-          href="/lobby/create"
+          href="/lobby/join"
           className="border-border-neutral-default text-foreground-neutral-default text-title-small inline-flex w-full items-center justify-center rounded-full border px-6 py-4 font-medium transition-transform active:scale-95"
         >
           Entrar em jogo
