@@ -1,8 +1,12 @@
-export function Atomium() {
+interface AtomiumProps {
+  size?: number;
+}
+
+export function Atomium({ size = 80 }: AtomiumProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={80}
+      width={size}
       fill="currentColor"
       viewBox="0 0 256 256"
     >
