@@ -1,7 +1,7 @@
-export type DifficultyLevel = 'easy' | 'medium' | 'hard';
+import { GameDifficulty } from '@/types/game';
 
 export interface DifficultyOption {
-  id: DifficultyLevel;
+  id: GameDifficulty;
   label: string;
 }
 
@@ -12,7 +12,7 @@ export const difficultyOptions: DifficultyOption[] = [
 ];
 
 export const game = {
-  defaultDifficulty: 'medium' as DifficultyLevel,
+  defaultDifficulty: 'medium' as GameDifficulty,
   minTeams: 2,
   maxTeams: 4,
   questionTimeLimit: 20,

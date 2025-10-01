@@ -2,23 +2,15 @@
 
 import { Atomium } from '@/assets/atomium';
 import { Container } from '@/components/container';
+import { Game } from '@/types/game';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-interface GameSession {
-  code: string;
-  name: string;
-  difficulty: 'easy' | 'medium' | 'hard';
-  createdAt: string;
-  players: Array<{ name: string; isHost: boolean }>;
-  status: 'waiting' | 'playing' | 'finished';
-}
-
 export default function GameLobby() {
   const params = useParams();
   const gameCode = params.gameCode as string;
-  const [gameSession, setGameSession] = useState<GameSession | null>(null);
+  const [gameSession, setGameSession] = useState<Game | null>(null);
 
   useEffect(() => {
     const storedGame = localStorage.getItem(`game_${gameCode}`);
