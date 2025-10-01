@@ -2,6 +2,7 @@
 
 import { Atomium } from '@/assets/atomium';
 import { Container } from '@/components/container';
+import { Game } from '@/types/game';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -21,15 +22,15 @@ export default function JoinGame() {
     setError('');
 
     try {
-      const storedGame = localStorage.getItem(`game_${gameCode.toUpperCase()}`);
+      const game = localStorage.getItem(`game_${gameCode.toUpperCase()}`);
 
-      if (!storedGame) {
+      if (!game) {
         setError('Jogo não encontrado. Verifica o código.');
         setIsJoining(false);
         return;
       }
 
-      const gameSession = JSON.parse(storedGame);
+      const gameSession: Game = JSON.parse(game);
 
       if (gameSession.players.length >= 4) {
         setError('Este jogo já está cheio (4 jogadores máximo).');
@@ -43,7 +44,7 @@ export default function JoinGame() {
         return;
       }
 
-      const updatedGameSession = {
+      const updatedGameSession: Game = {
         ...gameSession,
         players: [...gameSession.players, { name: name.trim(), isHost: false }],
       };

@@ -2,14 +2,15 @@
 
 import { Atomium } from '@/assets/atomium';
 import { Container } from '@/components/container';
-import { difficultyOptions, game, type DifficultyLevel } from '@/core/game';
+import { difficultyOptions, game } from '@/config/game';
+import { Game, GameDifficulty } from '@/types/game';
 import { generateGameCode } from '@/utils/utils';
 import Link from 'next/link';
 import { useState } from 'react';
 
 export default function CreateGame() {
   const [name, setName] = useState('');
-  const [difficulty, setDifficulty] = useState<DifficultyLevel>(
+  const [difficulty, setDifficulty] = useState<GameDifficulty>(
     game.defaultDifficulty,
   );
   const [isCreating, setIsCreating] = useState(false);
@@ -22,16 +23,16 @@ export default function CreateGame() {
     try {
       const gameCode = generateGameCode();
 
-      const gameSession = {
+      const game: Game = {
         code: gameCode,
         name: name.trim(),
         difficulty,
         createdAt: new Date().toISOString(),
         players: [{ name: name.trim(), isHost: true }],
-        status: 'waiting' as const,
+        status: 'waiting',
       };
 
-      localStorage.setItem(`game_${gameCode}`, JSON.stringify(gameSession));
+      localStorage.setItem(`game_${gameCode}`, JSON.stringify(game));
 
       setTimeout(() => {
         setIsCreating(false);
