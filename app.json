@@ -40,6 +40,28 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+              {
+                "fontFamily": "Bricolage Grotesque",
+                "fontDefinitions": [
+                  {
+                    "path": "./assets/fonts/BricolageGrotesque-Medium.ttf",
+                    "weight": 500,
+                    "style": "normal"
+                  },
+                  {
+                    "path": "./assets/fonts/BricolageGrotesque-SemiBold.ttf",
+                    "weight": 600,
+                    "style": "normal"
+                  }
+                ]
+              }
+            ]
+        }
       ]
     ],
     "experiments": {
