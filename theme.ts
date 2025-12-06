@@ -33,11 +33,12 @@ export const colors = {
       faded: "hsl(0, 0%, 92%)",
       inverse: "hsl(0, 0%, 4%)",
     },
+  },
+  shadow: {
+    neutral: {
+      default: "hsla(0, 0%, 0%, 0.2)",
+    }
   }
-};
-
-export const font = {
-  sans: 'BricolageGrotesque',
 };
 
 export const typography = {
