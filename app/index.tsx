@@ -1,17 +1,12 @@
 import { Button } from '@/components/button';
 import { colors, typography } from '@/theme';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function Index() {
-  function handleCreateGame() {
-    console.log("Create game");
-  }
-
-  function handleEnterGame() {
-    console.log("Enter game");
-  }
+  const router = useRouter();
 
   return (
     <LinearGradient
@@ -26,10 +21,18 @@ export default function Index() {
       </Text>
       </View>
       <View style={styles.actions}>
-        <Button variant="inverse" style={styles.button} onPress={handleCreateGame}>
+        <Button
+          variant="inverse"
+          style={styles.button}
+          onPress={() => router.push('/create')}
+        >
           Criar novo jogo
         </Button>
-        <Button variant="outline" style={styles.button} onPress={handleEnterGame}>
+        <Button
+          variant="outline"
+          style={styles.button}
+          onPress={() => router.push('/join')}
+        >
           Entrar em jogo
         </Button>
       </View>
