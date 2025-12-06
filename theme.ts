@@ -43,18 +43,18 @@ export const colors = {
 
 export const typography = {
   body: {
-    small: { fontSize: 12, lineHeight: 18 },
-    medium: { fontSize: 14, lineHeight: 22 },
-    large: { fontSize: 16, lineHeight: 26 },
+    small: { fontSize: 12, lineHeight: 18, letterSpacing: -0.2 },
+    medium: { fontSize: 14, lineHeight: 22, letterSpacing: -0.2 },
+    large: { fontSize: 16, lineHeight: 26, letterSpacing: -0.2 },
   },
   title: {
-    small: { fontSize: 18, lineHeight: 28, letterSpacing: -0.02 },
-    medium: { fontSize: 20, lineHeight: 30, letterSpacing: -0.02 },
-    large: { fontSize: 24, lineHeight: 32, letterSpacing: -0.02 },
+    small: { fontSize: 18, lineHeight: 28, letterSpacing: -0.4 },
+    medium: { fontSize: 20, lineHeight: 30, letterSpacing: -0.4 },
+    large: { fontSize: 24, lineHeight: 32, letterSpacing: -0.4 },
   },
   display: {
-    small: { fontSize: 32, lineHeight: 40, letterSpacing: -0.04 },
-    medium: { fontSize: 40, lineHeight: 48, letterSpacing: -0.04 },
-    large: { fontSize: 48, lineHeight: 56, letterSpacing: -0.04 },
+    small: { fontSize: 32, lineHeight: 40, letterSpacing: -0.8 },
+    medium: { fontSize: 40, lineHeight: 48, letterSpacing: -0.8 },
+    large: { fontSize: 48, lineHeight: 56, letterSpacing: -0.8 },
   },
 };
