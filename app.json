@@ -40,6 +40,15 @@
             "backgroundColor": "#000000"
           }
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/BricolageGrotesque-Medium.ttf",
+            "./assets/fonts/BricolageGrotesque-SemiBold.ttf"
+          ]
+        }
       ]
     ],
     "experiments": {
