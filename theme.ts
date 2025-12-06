@@ -42,6 +42,7 @@ export const colors = {
 };
 
 export const typography = {
+  family: 'Bricolage Grotesque',
   body: {
     small: { fontSize: 12, lineHeight: 18, letterSpacing: -0.2 },
     medium: { fontSize: 14, lineHeight: 22, letterSpacing: -0.2 },
