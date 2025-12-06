@@ -109,7 +109,6 @@ export function Button({
       >
         <Text
           style={[
-            styles.text,
             variants.text,
             typography.title.small,
             { fontFamily: typography.family },
@@ -133,10 +132,5 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
-  },
-  text: {
-    textAlign: 'center',
-    fontWeight: '500',
-    textTransform: 'none',
   },
 });
