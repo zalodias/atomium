@@ -7,6 +7,7 @@ type ButtonSize = 'default' | 'large';
 
 interface ButtonProps {
   children: React.ReactNode;
+  icon?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
   style?: ViewStyle;
@@ -17,6 +18,7 @@ interface ButtonProps {
 
 export function Button({
   children,
+  icon,
   variant = 'default',
   size = 'default',
   style,
@@ -81,11 +83,11 @@ export function Button({
 
   const sizes = {
     default: {
-      paddingHorizontal: 24,
+      paddingHorizontal: icon ? 12 : 24,
       paddingVertical: 12
     },
     large: {
-      paddingHorizontal: 32,
+      paddingHorizontal: icon ? 16 : 32,
       paddingVertical: 16
     }
   }[size];
@@ -107,16 +109,20 @@ export function Button({
         disabled && styles.disabled,
         style]}
       >
-        <Text
-          style={[
-            variants.text,
-            typography.title.small,
-            { fontFamily: typography.family },
-            textStyle,
-          ]}
-        >
-          {children}
-        </Text>
+        {icon ? (
+          children
+        ) : (
+          <Text
+            style={[
+              variants.text,
+              typography.title.small,
+              { fontFamily: typography.family },
+              textStyle,
+            ]}
+          >
+            {children}
+          </Text>
+        )}
       </Animated.View>
     </Pressable>
   );
