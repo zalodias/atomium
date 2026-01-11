@@ -37,9 +37,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0,0,0,0.04)',
   },
   input: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    padding: 16,
     ...typography.title.small,
+    lineHeight: 0,
     fontFamily: typography.family,
     color: colors.foreground.neutral.inverse,
   },
