@@ -98,6 +98,7 @@ export function Button({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
+      style={style}
     >
       <Animated.View
         style={[{
@@ -106,8 +107,7 @@ export function Button({
         styles.button,
         variants.button,
         sizes,
-        disabled && styles.disabled,
-        style]}
+        disabled && styles.disabled]}
       >
         {icon ? (
           children
