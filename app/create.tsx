@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     gap: 24,
   },
   button: {
-    width: '100%',
+    flex: 1,
   },
   container: {
     flex: 1,

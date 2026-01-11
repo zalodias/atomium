@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     textShadowRadius: 6,
   },
   button: {
-    width: '100%',
+    flex: 1,
   },
   footer: {
     flexDirection: 'row',
