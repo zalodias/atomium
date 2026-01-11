@@ -2,17 +2,30 @@ import { Button } from '@/components/button';
 import { Input } from '@/components/input';
 import { Select } from '@/components/select';
 import { difficulty as options, type Difficulty } from '@/constants/difficulty';
+import { useGame } from '@/contexts/game';
 import { colors, typography } from '@/theme';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 
 export default function Create() {
   const router = useRouter();
+  const { createGame, isLoading } = useGame();
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [teamName, setTeamName] = useState('Atomic Warriors');
+
+  const handleCreateGame = async () => {
+    if (!teamName.trim()) return;
+    
+    const code = await createGame(teamName.trim(), difficulty);
+    if (code) {
+      router.push('/lobby');
+    } else {
+      Alert.alert('Erro', 'Não foi possível criar o jogo. Tenta novamente.');
+    }
+  };
 
   return (
     <LinearGradient
@@ -47,11 +60,16 @@ export default function Create() {
         </View>
       </View>
       <View style={styles.footer}>
-        <Button icon variant="outline" onPress={() => router.back()}>
-          <ArrowLeft size={24} color={colors.foreground.neutral.inverse} />
+        <Button icon variant='outline' onPress={() => router.back()} disabled={isLoading}>
+          <Image source={require('@/assets/icons/arrow-left.svg')} style={{ width: 24, height: 24 }} tintColor={colors.foreground.neutral.inverse} />
         </Button>
-        <Button variant="inverse" style={styles.button}>
-          Criar jogo
+        <Button 
+          variant="inverse" 
+          style={styles.button} 
+          onPress={handleCreateGame}
+          disabled={isLoading}
+        >
+          {isLoading ? 'A criar…' : 'Criar jogo'}
         </Button>
       </View>
     </LinearGradient>
@@ -97,4 +115,3 @@ const styles = StyleSheet.create({
     textShadowRadius: 6,
   },
 });
-
