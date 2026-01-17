@@ -36,7 +36,7 @@ export default function Lobby() {
       }
       return allReady ? 'Iniciar jogo' : 'A aguardar jogadores';
     }
-    return currentTeam?.status === 'ready' ? 'Estou pronto' : 'Estou pronto';
+    return currentTeam?.status === 'ready' ? 'Cancelar' : 'Estou pronto';
   };
 
   const isButtonDisabled = () => {
