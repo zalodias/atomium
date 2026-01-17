@@ -133,6 +133,8 @@ export function GameProvider({ children }: GameProviderProps) {
 
       if (updateError) {
         console.error('Error updating game host_id:', updateError);
+        await supabase.from('teams').delete().eq('id', team.id);
+        await supabase.from('games').delete().eq('id', gameData.id);
         return null;
       }
 
