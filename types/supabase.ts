@@ -1,5 +1,5 @@
 import type { Difficulty } from '@/constants/difficulty';
-import type { PlayerStatus } from './game';
+import type { PlayerStatus } from '@/types/game';
 
 export type Json =
   | string
