@@ -63,8 +63,42 @@ export function GameProvider({ children }: GameProviderProps) {
           table: 'games',
           filter: `id=eq.${gameId}`,
         },
-        (payload) => {
-          const updatedGame = payload.new as { is_started: boolean };
+        async (payload) => {
+          const updatedGame = payload.new as { 
+            is_started: boolean; 
+            molecule_id: string | null;
+          };
+          
+          // If molecule_id is set, fetch molecule data
+          if (updatedGame.molecule_id) {
+            const { data: molecule } = await supabase
+              .from('molecules')
+              .select('*')
+              .eq('id', updatedGame.molecule_id)
+              .single();
+              
+            if (molecule) {
+              setGame(prev => {
+                if (!prev) return null;
+                return {
+                  ...prev,
+                  isStarted: updatedGame.is_started,
+                  molecule: {
+                    id: molecule.id,
+                    name: molecule.name,
+                    formula: molecule.formula,
+                    description: molecule.description,
+                    composition: molecule.composition,
+                    structure: molecule.structure,
+                    difficulty: molecule.difficulty,
+                  },
+                };
+              });
+              return;
+            }
+          }
+          
+          // If no molecule, just update is_started
           setGame(prev => {
             if (!prev) return null;
             return {
@@ -276,23 +310,39 @@ export function GameProvider({ children }: GameProviderProps) {
   const startGame = useCallback(async () => {
     if (!game) return;
     
-    const { error } = await supabase
-      .from('games')
-      .update({ is_started: true })
-      .eq('id', game.id);
+    try {
+      // 1. Select random molecule based on difficulty
+      const { data: molecules, error: moleculeError } = await supabase
+        .from('molecules')
+        .select('*')
+        .eq('difficulty', game.difficulty);
+        
+      if (moleculeError || !molecules || molecules.length === 0) {
+        console.error('No molecules found for difficulty:', game.difficulty, moleculeError);
+        return;
+      }
+      
+      // Pick a random molecule from the available ones
+      const randomMolecule = molecules[Math.floor(Math.random() * molecules.length)];
+      
+      // 2. Update game with molecule_id and is_started
+      const { error } = await supabase
+        .from('games')
+        .update({ 
+          molecule_id: randomMolecule.id,
+          is_started: true 
+        })
+        .eq('id', game.id);
 
-    if (error) {
-      console.error('Error starting game:', error);
-      return;
+      if (error) {
+        console.error('Error starting game:', error);
+        return;
+      }
+
+      // State will be updated via realtime subscription
+    } catch (error) {
+      console.error('Error in startGame:', error);
     }
-
-    setGame(prev => {
-      if (!prev) return null;
-      return {
-        ...prev,
-        isStarted: true,
-      };
-    });
   }, [game]);
 
   const leaveGame = useCallback(async () => {
