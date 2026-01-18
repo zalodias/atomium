@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   label: {
     ...typography.body.large,
     fontFamily: typography.family,
-    color: colors.foreground.neutral.subtle,
+    color: colors.foreground.neutral.faded,
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
@@ -123,11 +123,10 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   description: {
-    ...typography.body.large,
+  ...typography.title.small,
     fontFamily: typography.family,
-    color: colors.foreground.neutral.default,
+    color: colors.foreground.neutral.subtle,
     textAlign: 'center',
-    lineHeight: 28,
   },
   atomCounts: {
     flexDirection: 'row',
