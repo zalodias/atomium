@@ -5,11 +5,19 @@ import { colors, typography } from "@/theme";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 export default function Lobby() {
   const router = useRouter();
   const { game, isHost, currentTeam, allReady, toggleReady, startGame, leaveGame, isLoading } = useGame();
+
+  // Navigate to preview when game starts
+  useEffect(() => {
+    if (game?.isStarted) {
+      router.push('/preview');
+    }
+  }, [game?.isStarted, router]);
 
   const handleBack = async () => {
     await leaveGame();
