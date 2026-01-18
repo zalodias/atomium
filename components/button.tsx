@@ -49,7 +49,7 @@ export function Button({
   const variants = {
     default: {
       button: {
-        backgroundColor: colors.background.brand.subtle,
+        backgroundColor: colors.background.brand.strong,
       },
       text: {
         color: colors.foreground.neutral.inverse,
