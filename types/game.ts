@@ -9,6 +9,35 @@ export interface Team {
   isHost: boolean;
 }
 
+export interface Atom {
+  element: string;
+  count: number;
+}
+
+export interface Bond {
+  from: number;
+  to: number;
+}
+
+export interface MoleculeStructure {
+  atoms: {
+    element: string;
+    x: number;
+    y: number;
+  }[];
+  bonds: Bond[];
+}
+
+export interface Molecule {
+  id: string;
+  name: string;
+  formula: string;
+  description: string;
+  composition: Atom[];
+  structure: MoleculeStructure;
+  difficulty: Difficulty;
+}
+
 export interface GameState {
   id: string;
   code: string;
@@ -17,6 +46,7 @@ export interface GameState {
   hostId: string;
   currentTeamId: string;
   isStarted: boolean;
+  molecule?: Molecule;
 }
 
 export interface GameContextValue {
