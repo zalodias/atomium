@@ -9,20 +9,22 @@ export const colors = {
       inverse: "hsl(0, 0%, 4%)",
     },
     brand: {
-      subtle: "hsl(185, 96%, 64%)",
-      strong: "hsl(205, 96%, 56%)"
+      default: "hsl(200, 96%, 64%)",
+      strong: "hsl(205, 96%, 56%)",
+      subtle: "hsl(195, 64%, 80%)",
+      faded: "hsl(190, 96%, 96%)",
     },
   },
   foreground: {
     neutral: {
-      default: "hsl(0, 0%, 4%)",
-      strong: "hsl(0, 0%, 12%)",
-      subtle: "hsl(0, 0%, 24%)",
-      faded: "hsl(0, 0%, 48%)",
-      inverse: "hsl(0, 0%, 96%)",
+      default: "hsl(200, 2%, 4%)",
+      strong: "hsl(200, 4%, 12%)",
+      subtle: "hsl(200, 8%, 24%)",
+      faded: "hsl(200, 12%, 40%)",
+      inverse: "hsl(200, 2%, 96%)",
     },
     brand: {
-      default: "hsl(195, 96%, 48%)",
+      default: "hsl(200, 64%, 56%)",
     }
   },
   border: {
