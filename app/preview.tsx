@@ -39,7 +39,7 @@ export default function Preview() {
   return (
     <LinearGradient
       style={styles.container}
-      colors={['hsl(195, 64%, 80%)', 'hsl(195, 24%, 96%)']}
+      colors={[colors.background.brand.subtle, colors.background.brand.faded]}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
     >
