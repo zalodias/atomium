@@ -150,10 +150,10 @@ export function GameProvider({ children }: GameProviderProps) {
           if (inventories) {
             const teamInventories: Record<string, Inventory[]> = {};
             for (const inv of inventories) {
-              if (!teamInventories[inv.game_id]) {
-                teamInventories[inv.game_id] = [];
+              if (!teamInventories[inv.team_id]) {
+                teamInventories[inv.team_id] = [];
               }
-              teamInventories[inv.game_id].push({
+              teamInventories[inv.team_id].push({
                 element: inv.element,
                 count: inv.count,
               });
@@ -525,6 +525,7 @@ export function GameProvider({ children }: GameProviderProps) {
               .from('inventory')
               .select('*')
               .eq('game_id', game.id)
+              .eq('team_id', currentTeamId)
               .eq('element', atomToAward)
               .single();
             
