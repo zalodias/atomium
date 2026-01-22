@@ -1,5 +1,5 @@
 import type { Difficulty } from '@/constants/difficulty';
-import type { PlayerStatus } from '@/types/game';
+import type { PlayerStatus, QuestionType } from '@/types/game';
 
 export type Json =
   | string
@@ -20,6 +20,10 @@ export interface Database {
           host_id: string;
           is_started: boolean;
           molecule_id: string | null;
+          current_question_id: string | null;
+          current_question_started_at: string | null;
+          question_number: number;
+          total_questions: number;
           created_at: string;
         };
         Insert: {
@@ -29,6 +33,10 @@ export interface Database {
           host_id: string;
           is_started?: boolean;
           molecule_id?: string | null;
+          current_question_id?: string | null;
+          current_question_started_at?: string | null;
+          question_number?: number;
+          total_questions?: number;
           created_at?: string;
         };
         Update: {
@@ -38,6 +46,10 @@ export interface Database {
           host_id?: string;
           is_started?: boolean;
           molecule_id?: string | null;
+          current_question_id?: string | null;
+          current_question_started_at?: string | null;
+          question_number?: number;
+          total_questions?: number;
           created_at?: string;
         };
         Relationships: [
@@ -46,6 +58,13 @@ export interface Database {
             columns: ['molecule_id'];
             isOneToOne: false;
             referencedRelation: 'molecules';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'games_current_question_id_fkey';
+            columns: ['current_question_id'];
+            isOneToOne: false;
+            referencedRelation: 'questions';
             referencedColumns: ['id'];
           }
         ];
@@ -118,6 +137,130 @@ export interface Database {
           }
         ];
       };
+      questions: {
+        Row: {
+          id: string;
+          text: string;
+          type: QuestionType;
+          answer: string;
+          options: Json | null;
+          difficulty: Difficulty;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          text: string;
+          type: QuestionType;
+          answer: string;
+          options?: Json | null;
+          difficulty: Difficulty;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          text?: string;
+          type?: QuestionType;
+          answer?: string;
+          options?: Json | null;
+          difficulty?: Difficulty;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      answers: {
+        Row: {
+          id: string;
+          team_id: string;
+          game_id: string;
+          question_id: string;
+          selected_answer: string | null;
+          is_correct: boolean;
+          answered_at: string;
+        };
+        Insert: {
+          id?: string;
+          team_id: string;
+          game_id: string;
+          question_id: string;
+          selected_answer?: string | null;
+          is_correct?: boolean;
+          answered_at?: string;
+        };
+        Update: {
+          id?: string;
+          team_id?: string;
+          game_id?: string;
+          question_id?: string;
+          selected_answer?: string | null;
+          is_correct?: boolean;
+          answered_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'answers_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'answers_game_id_fkey';
+            columns: ['game_id'];
+            isOneToOne: false;
+            referencedRelation: 'games';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'answers_question_id_fkey';
+            columns: ['question_id'];
+            isOneToOne: false;
+            referencedRelation: 'questions';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
+      inventory: {
+        Row: {
+          id: string;
+          team_id: string;
+          game_id: string;
+          element: string;
+          count: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          team_id: string;
+          game_id: string;
+          element: string;
+          count?: number;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          team_id?: string;
+          game_id?: string;
+          element?: string;
+          count?: number;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'inventory_team_id_fkey';
+            columns: ['team_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'inventory_game_id_fkey';
+            columns: ['game_id'];
+            isOneToOne: false;
+            referencedRelation: 'games';
+            referencedColumns: ['id'];
+          }
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -135,5 +278,8 @@ export interface Database {
 }
 
 export type Game = Database['public']['Tables']['games']['Row'];
-export type TeamRow = Database['public']['Tables']['teams']['Row'];
-export type MoleculeRow = Database['public']['Tables']['molecules']['Row'];
+export type Team = Database['public']['Tables']['teams']['Row'];
+export type Molecule = Database['public']['Tables']['molecules']['Row'];
+export type Question = Database['public']['Tables']['questions']['Row'];
+export type Answer = Database['public']['Tables']['answers']['Row'];
+export type Inventory = Database['public']['Tables']['inventory']['Row'];
