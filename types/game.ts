@@ -38,6 +38,31 @@ export interface Molecule {
   difficulty: Difficulty;
 }
 
+export type QuestionType = 'multiple_choice' | 'true_false';
+
+export interface Question {
+  id: string;
+  text: string;
+  type: QuestionType;
+  answer: string;
+  options?: string[];
+  difficulty: Difficulty;
+}
+
+export interface Answer {
+  id: string;
+  teamId: string;
+  questionId: string;
+  selectedAnswer: string | null;
+  isCorrect: boolean;
+  answeredAt: string;
+}
+
+export interface Inventory {
+  element: string;
+  count: number;
+}
+
 export interface GameState {
   id: string;
   code: string;
@@ -47,6 +72,12 @@ export interface GameState {
   currentTeamId: string;
   isStarted: boolean;
   molecule?: Molecule;
+  currentQuestion?: Question;
+  questionStartedAt?: number;
+  questionNumber: number;
+  totalQuestions: number;
+  teamInventories: Record<string, Inventory[]>;
+  hasAnswered: boolean;
 }
 
 export interface GameContextValue {
@@ -56,6 +87,9 @@ export interface GameContextValue {
   toggleReady: () => Promise<void>;
   startGame: () => Promise<void>;
   leaveGame: () => Promise<void>;
+  loadNextQuestion: () => Promise<void>;
+  submitAnswer: (answer: string, atomToAward?: string) => Promise<boolean>;
+  getCurrentInventory: () => Inventory[];
   isHost: boolean;
   currentTeam: Team | null;
   allReady: boolean;
