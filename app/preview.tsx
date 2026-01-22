@@ -33,7 +33,7 @@ export default function Preview() {
   }
   
   const handleStartGame = () => {
-    console.log('Starting game with molecule:', game.molecule?.name);
+    router.push('/game');
   };
   
   return (
