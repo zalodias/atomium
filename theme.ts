@@ -14,6 +14,18 @@ export const colors = {
       subtle: "hsl(195, 64%, 80%)",
       faded: "hsl(190, 96%, 96%)",
     },
+    positive: {
+      default: "hsl(145, 60%, 94%)",
+    },
+    negative: {
+      default: "hsl(0, 60%, 94%)",
+    },
+    glass: {
+      default: "hsla(0, 0%, 100%, 0.8)",
+      strong: "hsla(0, 0%, 100%, 0.6)",
+      subtle: "hsla(0, 0%, 100%, 0.4)",
+      faded: "hsla(0, 0%, 100%, 0.2)",
+    }
   },
   foreground: {
     neutral: {
@@ -25,7 +37,13 @@ export const colors = {
     },
     brand: {
       default: "hsl(200, 64%, 56%)",
-    }
+    },
+    positive: {
+      default: "hsl(145, 60%, 50%)",
+    },
+    negative: {
+      default: "hsl(0, 60%, 55%)",
+    },
   },
   border: {
     neutral: {
@@ -34,6 +52,15 @@ export const colors = {
       subtle: "hsl(0, 0%, 88%)",
       faded: "hsl(0, 0%, 92%)",
       inverse: "hsl(0, 0%, 4%)",
+    },
+    positive: {
+      default: "hsl(145, 60%, 50%)",
+    },
+    negative: {
+      default: "hsl(0, 60%, 55%)",
+    },
+    glass: {
+      default: "hsl(0, 0%, 100%)",
     },
   },
   shadow: {
