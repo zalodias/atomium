@@ -1,9 +1,11 @@
 import type { Difficulty } from '@/constants/difficulty';
 import { supabase } from '@/lib/supabase';
-import type { GameContextValue, GameState, Team } from '@/types/game';
+import type { Atom, GameContextValue, GameState, Inventory, Molecule, MoleculeStructure, Question, Team } from '@/types/game';
 import { generateGameCode } from '@/utils/game';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+
+const QUESTION_TIME_SECONDS = 20;
 
 const GameContext = createContext<GameContextValue | null>(null);
 
@@ -67,45 +69,104 @@ export function GameProvider({ children }: GameProviderProps) {
           const updatedGame = payload.new as { 
             is_started: boolean; 
             molecule_id: string | null;
+            current_question_id: string | null;
+            current_question_started_at: string | null;
+            question_number: number;
+            total_questions: number;
           };
           
-          // If molecule_id is set, fetch molecule data
+          // Fetch molecule data if molecule_id is set
+          let moleculeData: Molecule | null = null;
           if (updatedGame.molecule_id) {
             const { data: molecule } = await supabase
               .from('molecules')
               .select('*')
               .eq('id', updatedGame.molecule_id)
               .single();
-              
             if (molecule) {
-              setGame(prev => {
-                if (!prev) return null;
-                return {
-                  ...prev,
-                  isStarted: updatedGame.is_started,
-                  molecule: {
-                    id: molecule.id,
-                    name: molecule.name,
-                    formula: molecule.formula,
-                    description: molecule.description,
-                    composition: molecule.composition,
-                    structure: molecule.structure,
-                    difficulty: molecule.difficulty,
-                  },
-                };
-              });
-              return;
+              moleculeData = {
+                id: molecule.id,
+                name: molecule.name,
+                formula: molecule.formula,
+                description: molecule.description,
+                composition: molecule.composition as unknown as Atom[],
+                structure: molecule.structure as unknown as MoleculeStructure,
+                difficulty: molecule.difficulty,
+              };
             }
           }
           
-          // If no molecule, just update is_started
+          // Fetch question data if current_question_id is set
+          let questionData: Question | undefined = undefined;
+          if (updatedGame.current_question_id) {
+            const { data: question } = await supabase
+              .from('questions')
+              .select('*')
+              .eq('id', updatedGame.current_question_id)
+              .single();
+            if (question) {
+              questionData = {
+                id: question.id,
+                text: question.text,
+                type: question.type,
+                answer: question.answer,
+                options: question.options as string[] | undefined,
+                difficulty: question.difficulty,
+              };
+            }
+          }
+          
           setGame(prev => {
             if (!prev) return null;
             return {
               ...prev,
               isStarted: updatedGame.is_started,
+              molecule: moleculeData || prev.molecule,
+              currentQuestion: questionData,
+              questionStartedAt: updatedGame.current_question_started_at 
+                ? new Date(updatedGame.current_question_started_at).getTime() 
+                : undefined,
+              questionNumber: updatedGame.question_number,
+              totalQuestions: updatedGame.total_questions,
+              hasAnswered: false,
             };
           });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'inventory',
+          filter: `game_id=eq.${gameId}`,
+        },
+        async () => {
+          const { data: inventories } = await supabase
+            .from('inventory')
+            .select('*')
+            .eq('game_id', gameId);
+          
+          if (inventories) {
+            const teamInventories: Record<string, Inventory[]> = {};
+            for (const inv of inventories) {
+              if (!teamInventories[inv.game_id]) {
+                teamInventories[inv.game_id] = [];
+              }
+              teamInventories[inv.game_id].push({
+                element: inv.element,
+                count: inv.count,
+              });
+            }
+            
+            setGame(prev => {
+              if (!prev) return null;
+              return {
+                ...prev,
+                teamInventories,
+              };
+            });
+          }
         }
       )
       .subscribe();
@@ -187,6 +248,10 @@ export function GameProvider({ children }: GameProviderProps) {
         hostId: team.id,
         currentTeamId: team.id,
         isStarted: false,
+        questionNumber: 0,
+        totalQuestions: 10,
+        teamInventories: {},
+        hasAnswered: false,
       };
 
       setGame(newGame);
@@ -261,6 +326,10 @@ export function GameProvider({ children }: GameProviderProps) {
         hostId: gameData.host_id,
         currentTeamId: team.id,
         isStarted: gameData.is_started,
+        questionNumber: gameData.question_number,
+        totalQuestions: gameData.total_questions,
+        teamInventories: {},
+        hasAnswered: false,
       };
 
       setGame(newGame);
@@ -362,6 +431,143 @@ export function GameProvider({ children }: GameProviderProps) {
     setCurrentTeamId(null);
   }, [game, currentTeamId, channel]);
 
+  const loadNextQuestion = useCallback(async () => {
+    if (!game) return;
+    
+    try {
+      // Get questions that haven't been asked yet in this game
+      const { data: askedQuestions } = await supabase
+        .from('answers')
+        .select('question_id')
+        .eq('game_id', game.id);
+      
+      const askedQuestionIds = askedQuestions?.map(a => a.question_id) || [];
+      
+      // Get a random question that matches game difficulty and hasn't been asked
+      let query = supabase
+        .from('questions')
+        .select('*')
+        .eq('difficulty', game.difficulty);
+      
+      if (askedQuestionIds.length > 0) {
+        query = query.not('id', 'in', `(${askedQuestionIds.join(',')})`);
+      }
+      
+      const { data: questions, error: questionsError } = await query;
+      
+      if (questionsError || !questions || questions.length === 0) {
+        console.error('No more questions available:', questionsError);
+        return;
+      }
+      
+      // Pick a random question
+      const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+      const now = new Date().toISOString();
+      
+      // Update game with new question
+      const { error: updateError } = await supabase
+        .from('games')
+        .update({
+          current_question_id: randomQuestion.id,
+          current_question_started_at: now,
+          question_number: game.questionNumber + 1,
+        })
+        .eq('id', game.id);
+      
+      if (updateError) {
+        console.error('Error loading next question:', updateError);
+        return;
+      }
+      
+      // State will be updated via realtime subscription
+    } catch (error) {
+      console.error('Error in loadNextQuestion:', error);
+    }
+  }, [game]);
+
+  const submitAnswer = useCallback(async (answer: string, atomToAward?: string): Promise<boolean> => {
+    if (!game || !currentTeamId || !game.currentQuestion) return false;
+    
+    try {
+      const isCorrect = answer === game.currentQuestion.answer;
+      
+      // Insert team answer
+      const { error: answerError } = await supabase
+        .from('answers')
+        .insert({
+          team_id: currentTeamId,
+          game_id: game.id,
+          question_id: game.currentQuestion.id,
+          selected_answer: answer,
+          is_correct: isCorrect,
+          answered_at: new Date().toISOString(),
+        });
+      
+      if (answerError) {
+        console.error('Error submitting answer:', answerError);
+        return false;
+      }
+      
+      // If correct, award the specified atom only if it's still needed
+      if (isCorrect && game.molecule && atomToAward) {
+        const composition = game.molecule.composition;
+        const requiredAtom = composition.find(atom => atom.element === atomToAward);
+        
+        if (requiredAtom) {
+          // Check current inventory for this element
+          const currentInventory = game.teamInventories[currentTeamId] || [];
+          const currentCount = currentInventory.find(inv => inv.element === atomToAward)?.count || 0;
+          
+          // Only award if we haven't reached the required amount
+          if (currentCount < requiredAtom.count) {
+            // Check if inventory row exists
+            const { data: existing } = await supabase
+              .from('inventory')
+              .select('*')
+              .eq('game_id', game.id)
+              .eq('element', atomToAward)
+              .single();
+            
+            if (existing) {
+              await supabase
+                .from('inventory')
+                .update({ count: existing.count + 1 })
+                .eq('id', existing.id);
+            } else {
+              await supabase
+                .from('inventory')
+                .insert({
+                  team_id: currentTeamId,
+                  game_id: game.id,
+                  element: atomToAward,
+                  count: 1,
+                });
+            }
+          }
+        }
+      }
+      
+      // Update local state to mark as answered
+      setGame(prev => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          hasAnswered: true,
+        };
+      });
+      
+      return isCorrect;
+    } catch (error) {
+      console.error('Error in submitAnswer:', error);
+      return false;
+    }
+  }, [game, currentTeamId]);
+
+  const getCurrentInventory = useCallback((): Inventory[] => {
+    if (!game || !currentTeamId) return [];
+    return game.teamInventories[currentTeamId] || [];
+  }, [game, currentTeamId]);
+
   const currentTeam = useMemo(() => {
     if (!game || !currentTeamId) return null;
     return game.teams.find(t => t.id === currentTeamId) || null;
@@ -383,11 +589,14 @@ export function GameProvider({ children }: GameProviderProps) {
     toggleReady,
     startGame,
     leaveGame,
+    loadNextQuestion,
+    submitAnswer,
+    getCurrentInventory,
     isHost,
     currentTeam,
     allReady,
     isLoading,
-  }), [game, createGame, joinGame, toggleReady, startGame, leaveGame, isHost, currentTeam, allReady, isLoading]);
+  }), [game, createGame, joinGame, toggleReady, startGame, leaveGame, loadNextQuestion, submitAnswer, getCurrentInventory, isHost, currentTeam, allReady, isLoading]);
 
   return (
     <GameContext.Provider value={value}>
