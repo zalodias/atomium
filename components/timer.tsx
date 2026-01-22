@@ -17,29 +17,36 @@ export function Timer({ duration, startTime, onTimeUp, isPaused = false }: Timer
   useEffect(() => {
     if (isPaused) return;
 
-    const calculateProgress = () => {
+    // Calculate initial state
+    const elapsed = (Date.now() - startTime) / 1000;
+    const remaining = Math.max(0, duration - elapsed);
+    const initialTimeLeft = Math.ceil(remaining);
+    const initialProgress = Math.max(0, Math.min(1, remaining / duration));
+    
+    setTimeLeft(initialTimeLeft);
+    setProgress(initialProgress);
+
+    // Check if already expired
+    if (initialTimeLeft <= 0) {
+      onTimeUp();
+      return;
+    }
+
+    // Update once per second
+    const interval = setInterval(() => {
       const elapsed = (Date.now() - startTime) / 1000;
       const remaining = Math.max(0, duration - elapsed);
-      const timeLeftSeconds = Math.ceil(remaining);
-      const progressValue = Math.max(0, Math.min(1, remaining / duration));
-      const roundedProgress = Math.round(progressValue * 100) / 100;
-      return { timeLeftSeconds, progressValue: roundedProgress };
-    };
-
-    const { timeLeftSeconds, progressValue } = calculateProgress();
-    setTimeLeft(timeLeftSeconds);
-    setProgress(progressValue);
-
-    const interval = setInterval(() => {
-      const { timeLeftSeconds, progressValue } = calculateProgress();
-      setTimeLeft(timeLeftSeconds);
-      setProgress(progressValue);
+      const newTimeLeft = Math.ceil(remaining);
+      const newProgress = Math.max(0, Math.min(1, remaining / duration));
       
-      if (timeLeftSeconds <= 0) {
+      setTimeLeft(newTimeLeft);
+      setProgress(newProgress);
+      
+      if (newTimeLeft <= 0) {
         clearInterval(interval);
         onTimeUp();
       }
-    }, 100);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [duration, startTime, onTimeUp, isPaused]);
@@ -73,6 +80,7 @@ export function Timer({ duration, startTime, onTimeUp, isPaused = false }: Timer
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
+            transform={`rotate(-90 ${center} ${center})`}
           />
         </Svg>
         <Text style={styles.timeText}>{timeLeft}</Text>
