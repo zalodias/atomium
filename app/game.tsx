@@ -65,7 +65,7 @@ export default function Game() {
         }
       }
     }
-  }, [game?.currentQuestion?.id, game?.molecule, game?.teamInventories, currentTeam]);
+  }, [game?.currentQuestion?.id, game?.molecule, currentTeam]);
 
   // Load first question when game starts (host only)
   useEffect(() => {
