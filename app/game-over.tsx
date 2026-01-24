@@ -58,16 +58,16 @@ export default function GameOver() {
         <Text style={styles.title}>Jogo concluído!</Text>
         {winner && (
           <View style={styles.winner}>
-              <View style={styles.winnerAvatar}>
-                <Image 
-                  source={require('@/assets/icons/atom.svg')} 
-                  style={{ width: 48, height: 48 }} 
-                  tintColor={colors.foreground.brand.default} 
-                />
-                <View style={styles.positionBadge}>
-                  <Text style={styles.positionBadgeText}>1</Text>
-                </View>
+            <View style={styles.winnerAvatar}>
+              <Image 
+                source={require('@/assets/icons/atom.svg')} 
+                style={{ width: 48, height: 48 }} 
+                tintColor={colors.foreground.brand.default} 
+              />
+              <View style={styles.positionBadge}>
+                <Text style={styles.positionBadgeText}>1</Text>
               </View>
+            </View>
             <View style={styles.details}>
               <Text style={styles.winnerName}>{winner.team.name}</Text>
               <Text style={styles.winnerLabel}>Vencedores</Text>
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     height: 80,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 48,
+    borderRadius: 40,
     backgroundColor: colors.background.neutral.default,
     borderWidth: 2,
     borderColor: colors.foreground.brand.default,
