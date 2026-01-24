@@ -67,7 +67,9 @@ export function GameProvider({ children }: GameProviderProps) {
         },
         async (payload) => {
           const updatedGame = payload.new as { 
-            is_started: boolean; 
+            is_started: boolean;
+            is_finished: boolean;
+            winner_id: string | null;
             molecule_id: string | null;
             current_question_id: string | null;
             current_question_started_at: string | null;
@@ -121,6 +123,8 @@ export function GameProvider({ children }: GameProviderProps) {
             return {
               ...prev,
               isStarted: updatedGame.is_started,
+              isFinished: updatedGame.is_finished,
+              winnerId: updatedGame.winner_id || undefined,
               molecule: moleculeData || prev.molecule,
               currentQuestion: questionData,
               questionStartedAt: updatedGame.current_question_started_at 
@@ -248,6 +252,7 @@ export function GameProvider({ children }: GameProviderProps) {
         hostId: team.id,
         currentTeamId: team.id,
         isStarted: false,
+        isFinished: false,
         questionNumber: 0,
         totalQuestions: 10,
         teamInventories: {},
@@ -326,6 +331,8 @@ export function GameProvider({ children }: GameProviderProps) {
         hostId: gameData.host_id,
         currentTeamId: team.id,
         isStarted: gameData.is_started,
+        isFinished: gameData.is_finished,
+        winnerId: gameData.winner_id || undefined,
         questionNumber: gameData.question_number,
         totalQuestions: gameData.total_questions,
         teamInventories: {},
