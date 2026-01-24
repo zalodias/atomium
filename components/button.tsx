@@ -57,11 +57,11 @@ export function Button({
     },
     inverse: {
       button: {
-        backgroundColor: colors.background.neutral.default,
+        backgroundColor: colors.background.glass.default,
         borderWidth: 1,
-        borderColor: colors.background.neutral.default,
-        shadowColor: colors.background.neutral.inverse,
-        shadowOpacity: 0.08,
+        borderColor: colors.border.glass.default,
+        shadowColor: colors.shadow.neutral.default,
+        shadowOpacity: 0.4,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 4,
       },
