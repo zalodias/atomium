@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase';
 import type { Atom, GameContextValue, GameState, Inventory, Molecule, MoleculeStructure, Question, Team, TeamProgress } from '@/types/game';
 import { generateGameCode } from '@/utils/game';
 import type { RealtimeChannel } from '@supabase/supabase-js';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 const QUESTION_TIME_SECONDS = 20;
 
@@ -18,6 +18,7 @@ export function GameProvider({ children }: GameProviderProps) {
   const [currentTeamId, setCurrentTeamId] = useState<string | null>(null);
   const [channel, setChannel] = useState<RealtimeChannel | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const winCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   
   const subscribeToGame = useCallback((gameId: string) => {
@@ -185,6 +186,14 @@ export function GameProvider({ children }: GameProviderProps) {
       }
     };
   }, [channel]);
+
+  useEffect(() => {
+    return () => {
+      if (winCheckTimeoutRef.current) {
+        clearTimeout(winCheckTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const createGame = useCallback(async (teamName: string, difficulty: Difficulty): Promise<string | null> => {
     setIsLoading(true);
@@ -492,6 +501,49 @@ export function GameProvider({ children }: GameProviderProps) {
     }
   }, [game]);
 
+  const checkWinCondition = useCallback(async (teamId: string): Promise<boolean> => {
+    if (!game?.molecule) return false;
+    
+    // Fetch fresh inventory data from database
+    const { data: inventories } = await supabase
+      .from('inventory')
+      .select('*')
+      .eq('game_id', game.id)
+      .eq('team_id', teamId);
+    
+    const inventory = inventories || [];
+    const composition = game.molecule.composition;
+    
+    // Check if all required atoms are collected
+    return composition.every(required => {
+      const collected = inventory.find(inv => inv.element === required.element)?.count || 0;
+      return collected >= required.count;
+    });
+  }, [game]);
+
+  const endGame = useCallback(async (winnerId: string) => {
+    if (!game) return;
+    
+    try {
+      const { error } = await supabase
+        .from('games')
+        .update({
+          is_finished: true,
+          winner_id: winnerId,
+        })
+        .eq('id', game.id);
+      
+      if (error) {
+        console.error('Error ending game:', error);
+        return;
+      }
+      
+      // State will be updated via realtime subscription
+    } catch (error) {
+      console.error('Error in endGame:', error);
+    }
+  }, [game]);
+
   const submitAnswer = useCallback(async (answer: string, atomToAward?: string): Promise<boolean> => {
     if (!game || !currentTeamId || !game.currentQuestion) return false;
     
@@ -554,11 +606,16 @@ export function GameProvider({ children }: GameProviderProps) {
             
             // Check win condition after awarding atom
             // Wait a moment for inventory to update
-            setTimeout(async () => {
+            // Clear any existing timeout
+            if (winCheckTimeoutRef.current) {
+              clearTimeout(winCheckTimeoutRef.current);
+            }
+            winCheckTimeoutRef.current = setTimeout(async () => {
               const hasWon = await checkWinCondition(currentTeamId);
               if (hasWon) {
                 await endGame(currentTeamId);
               }
+              winCheckTimeoutRef.current = null;
             }, 500);
           }
         }
@@ -578,50 +635,7 @@ export function GameProvider({ children }: GameProviderProps) {
       console.error('Error in submitAnswer:', error);
       return false;
     }
-  }, [game, currentTeamId]);
-
-  const checkWinCondition = useCallback(async (teamId: string): Promise<boolean> => {
-    if (!game?.molecule) return false;
-    
-    // Fetch fresh inventory data from database
-    const { data: inventories } = await supabase
-      .from('inventory')
-      .select('*')
-      .eq('game_id', game.id)
-      .eq('team_id', teamId);
-    
-    const inventory = inventories || [];
-    const composition = game.molecule.composition;
-    
-    // Check if all required atoms are collected
-    return composition.every(required => {
-      const collected = inventory.find(inv => inv.element === required.element)?.count || 0;
-      return collected >= required.count;
-    });
-  }, [game]);
-
-  const endGame = useCallback(async (winnerId: string) => {
-    if (!game) return;
-    
-    try {
-      const { error } = await supabase
-        .from('games')
-        .update({
-          is_finished: true,
-          winner_id: winnerId,
-        })
-        .eq('id', game.id);
-      
-      if (error) {
-        console.error('Error ending game:', error);
-        return;
-      }
-      
-      // State will be updated via realtime subscription
-    } catch (error) {
-      console.error('Error in endGame:', error);
-    }
-  }, [game]);
+  }, [game, currentTeamId, checkWinCondition, endGame]);
 
   const getAllTeamsProgress = useCallback(() => {
     if (!game?.molecule) return [];
