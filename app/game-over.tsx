@@ -8,69 +8,29 @@ import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-// Development mode flag - set to true to test with mock data
-const USE_MOCK_DATA = __DEV__ && true;
-
 export default function GameOver() {
   const router = useRouter();
   const { game, getAllTeamsProgress, leaveGame, createGame, isHost } = useGame();
   
-  // Redirect if game is not finished or doesn't exist (skip check when using mock data)
+  // Redirect if game is not finished or doesn't exist
   useEffect(() => {
-    if (!USE_MOCK_DATA && (!game || !game.isFinished)) {
+    if (!game || !game.isFinished) {
       router.replace('/');
     }
   }, [game, router]);
   
-  // Mock data for testing multiple teams UI
-  const mockRankings = [
-    { 
-      team: { id: '1', name: 'Químicos Vitoriosos', status: 'ready' as const, isHost: true },
-      collected: 8, 
-      total: 8, 
-      percentage: 100 
-    },
-    { 
-      team: { id: '2', name: 'Cientistas Unidos', status: 'ready' as const, isHost: false },
-      collected: 7, 
-      total: 8, 
-      percentage: 87.5 
-    },
-    { 
-      team: { id: '3', name: 'Átomos Loucos', status: 'ready' as const, isHost: false },
-      collected: 5, 
-      total: 8, 
-      percentage: 62.5 
-    },
-    { 
-      team: { id: '4', name: 'Moléculas Rápidas', status: 'ready' as const, isHost: false },
-      collected: 3, 
-      total: 8, 
-      percentage: 37.5 
-    },
-  ];
-  
-  const mockWinnerId = '1';
-  
-  // Use mock data or real data based on flag
-  const rankings = USE_MOCK_DATA ? mockRankings : (game ? getAllTeamsProgress() : []);
-  const winnerId = USE_MOCK_DATA ? mockWinnerId : game?.winnerId;
+  const rankings = game ? getAllTeamsProgress() : [];
+  const winnerId = game?.winnerId;
   const winner = rankings.find(r => r.team.id === winnerId);
   const otherTeams = rankings.filter(r => r.team.id !== winnerId);
   
-  if (!USE_MOCK_DATA && (!game || !game.isFinished)) {
+  if (!game || !game.isFinished) {
     return null;
   }
   
   const handlePlayAgain = async () => {
-    if (USE_MOCK_DATA) {
-      // In mock mode, just navigate back to home
-      router.replace('/');
-      return;
-    }
-    
     // Store current settings
-    const difficulty = game!.difficulty;
+    const difficulty = game.difficulty;
     
     // Leave current game
     await leaveGame();
@@ -83,12 +43,6 @@ export default function GameOver() {
   };
   
   const handleReturnHome = async () => {
-    if (USE_MOCK_DATA) {
-      // In mock mode, just navigate back to home
-      router.replace('/');
-      return;
-    }
-    
     await leaveGame();
     router.replace('/');
   };
