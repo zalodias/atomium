@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     color: colors.foreground.neutral.strong,
   },
   progressBadge: {
-    paddingInline: 12,
+    paddingHorizontal: 12,
   },
   progressText: {
     ...typography.body.medium,
