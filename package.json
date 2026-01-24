@@ -6,7 +6,13 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "supabase": "supabase",
+    "db:push": "supabase db push",
+    "db:pull": "supabase db pull",
+    "db:reset": "supabase db reset",
+    "db:diff": "supabase db diff",
+    "db:types": "supabase gen types typescript --local > types/supabase.ts"
   },
   "dependencies": {
     "@react-navigation/bottom-tabs": "^7.4.0",
@@ -40,6 +46,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.10",
+    "supabase": "^2.72.8",
     "typescript": "~5.9.2"
   },
   "private": true
