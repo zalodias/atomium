@@ -20,6 +20,9 @@ export const colors = {
     negative: {
       default: "hsl(0, 60%, 94%)",
     },
+    warning: {
+      default: "hsl(40, 96%, 48%)",
+    },
     glass: {
       default: "hsla(0, 0%, 100%, 0.8)",
       strong: "hsla(0, 0%, 100%, 0.6)",
