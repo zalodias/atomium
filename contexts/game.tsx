@@ -551,6 +551,15 @@ export function GameProvider({ children }: GameProviderProps) {
                   count: 1,
                 });
             }
+            
+            // Check win condition after awarding atom
+            // Wait a moment for inventory to update
+            setTimeout(async () => {
+              const hasWon = await checkWinCondition(currentTeamId);
+              if (hasWon) {
+                await endGame(currentTeamId);
+              }
+            }, 500);
           }
         }
       }
@@ -570,6 +579,82 @@ export function GameProvider({ children }: GameProviderProps) {
       return false;
     }
   }, [game, currentTeamId]);
+
+  const checkWinCondition = useCallback(async (teamId: string): Promise<boolean> => {
+    if (!game?.molecule) return false;
+    
+    // Fetch fresh inventory data from database
+    const { data: inventories } = await supabase
+      .from('inventory')
+      .select('*')
+      .eq('game_id', game.id)
+      .eq('team_id', teamId);
+    
+    const inventory = inventories || [];
+    const composition = game.molecule.composition;
+    
+    // Check if all required atoms are collected
+    return composition.every(required => {
+      const collected = inventory.find(inv => inv.element === required.element)?.count || 0;
+      return collected >= required.count;
+    });
+  }, [game]);
+
+  const endGame = useCallback(async (winnerId: string) => {
+    if (!game) return;
+    
+    try {
+      const { error } = await supabase
+        .from('games')
+        .update({
+          is_finished: true,
+          winner_id: winnerId,
+        })
+        .eq('id', game.id);
+      
+      if (error) {
+        console.error('Error ending game:', error);
+        return;
+      }
+      
+      // State will be updated via realtime subscription
+    } catch (error) {
+      console.error('Error in endGame:', error);
+    }
+  }, [game]);
+
+  const getAllTeamsProgress = useCallback(() => {
+    if (!game?.molecule) return [];
+    
+    const composition = game.molecule.composition;
+    const totalAtomsRequired = composition.reduce((sum, atom) => sum + atom.count, 0);
+    
+    interface TeamProgress {
+      team: Team;
+      collected: number;
+      total: number;
+      percentage: number;
+    }
+    
+    const progress: TeamProgress[] = game.teams.map(team => {
+      const inventory = game.teamInventories[team.id] || [];
+      const collected = inventory.reduce((sum, inv) => sum + inv.count, 0);
+      
+      return {
+        team,
+        collected,
+        total: totalAtomsRequired,
+        percentage: (collected / totalAtomsRequired) * 100,
+      };
+    });
+    
+    // Sort: winner first, then by percentage descending
+    return progress.sort((a, b) => {
+      if (a.team.id === game.winnerId) return -1;
+      if (b.team.id === game.winnerId) return 1;
+      return b.percentage - a.percentage;
+    });
+  }, [game]);
 
   const getCurrentInventory = useCallback((): Inventory[] => {
     if (!game || !currentTeamId) return [];
@@ -600,11 +685,12 @@ export function GameProvider({ children }: GameProviderProps) {
     loadNextQuestion,
     submitAnswer,
     getCurrentInventory,
+    getAllTeamsProgress,
     isHost,
     currentTeam,
     allReady,
     isLoading,
-  }), [game, createGame, joinGame, toggleReady, startGame, leaveGame, loadNextQuestion, submitAnswer, getCurrentInventory, isHost, currentTeam, allReady, isLoading]);
+  }), [game, createGame, joinGame, toggleReady, startGame, leaveGame, loadNextQuestion, submitAnswer, getCurrentInventory, getAllTeamsProgress, isHost, currentTeam, allReady, isLoading]);
 
   return (
     <GameContext.Provider value={value}>
