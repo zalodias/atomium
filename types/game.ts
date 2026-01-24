@@ -71,6 +71,8 @@ export interface GameState {
   hostId: string;
   currentTeamId: string;
   isStarted: boolean;
+  isFinished: boolean;
+  winnerId?: string;
   molecule?: Molecule;
   currentQuestion?: Question;
   questionStartedAt?: number;
@@ -90,6 +92,7 @@ export interface GameContextValue {
   loadNextQuestion: () => Promise<void>;
   submitAnswer: (answer: string, atomToAward?: string) => Promise<boolean>;
   getCurrentInventory: () => Inventory[];
+  getAllTeamsProgress: () => { team: Team; collected: number; total: number; percentage: number; }[];
   isHost: boolean;
   currentTeam: Team | null;
   allReady: boolean;
