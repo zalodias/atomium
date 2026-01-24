@@ -63,6 +63,13 @@ export interface Inventory {
   count: number;
 }
 
+export interface TeamProgress {
+  team: Team;
+  collected: number;
+  total: number;
+  percentage: number;
+}
+
 export interface GameState {
   id: string;
   code: string;
@@ -92,7 +99,7 @@ export interface GameContextValue {
   loadNextQuestion: () => Promise<void>;
   submitAnswer: (answer: string, atomToAward?: string) => Promise<boolean>;
   getCurrentInventory: () => Inventory[];
-  getAllTeamsProgress: () => { team: Team; collected: number; total: number; percentage: number; }[];
+  getAllTeamsProgress: () => TeamProgress[];
   isHost: boolean;
   currentTeam: Team | null;
   allReady: boolean;
