@@ -19,6 +19,8 @@ export interface Database {
           difficulty: Difficulty;
           host_id: string;
           is_started: boolean;
+          is_finished: boolean;
+          winner_id: string | null;
           molecule_id: string | null;
           current_question_id: string | null;
           current_question_started_at: string | null;
@@ -32,6 +34,8 @@ export interface Database {
           difficulty: Difficulty;
           host_id: string;
           is_started?: boolean;
+          is_finished?: boolean;
+          winner_id?: string | null;
           molecule_id?: string | null;
           current_question_id?: string | null;
           current_question_started_at?: string | null;
@@ -45,6 +49,8 @@ export interface Database {
           difficulty?: Difficulty;
           host_id?: string;
           is_started?: boolean;
+          is_finished?: boolean;
+          winner_id?: string | null;
           molecule_id?: string | null;
           current_question_id?: string | null;
           current_question_started_at?: string | null;
@@ -65,6 +71,13 @@ export interface Database {
             columns: ['current_question_id'];
             isOneToOne: false;
             referencedRelation: 'questions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'games_winner_id_fkey';
+            columns: ['winner_id'];
+            isOneToOne: false;
+            referencedRelation: 'teams';
             referencedColumns: ['id'];
           }
         ];
