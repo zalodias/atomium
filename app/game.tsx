@@ -36,6 +36,13 @@ export default function Game() {
     }
   }, [game, router]);
 
+  // Redirect to game-over when game is finished
+  useEffect(() => {
+    if (game?.isFinished) {
+      router.replace('/game-over');
+    }
+  }, [game?.isFinished, router]);
+
   // Reset state when new question loads
   useEffect(() => {
     if (game?.currentQuestion && currentTeam) {
