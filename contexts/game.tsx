@@ -1,6 +1,6 @@
 import type { Difficulty } from '@/constants/difficulty';
 import { supabase } from '@/lib/supabase';
-import type { Atom, GameContextValue, GameState, Inventory, Molecule, MoleculeStructure, Question, Team } from '@/types/game';
+import type { Atom, GameContextValue, GameState, Inventory, Molecule, MoleculeStructure, Question, Team, TeamProgress } from '@/types/game';
 import { generateGameCode } from '@/utils/game';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -628,13 +628,6 @@ export function GameProvider({ children }: GameProviderProps) {
     
     const composition = game.molecule.composition;
     const totalAtomsRequired = composition.reduce((sum, atom) => sum + atom.count, 0);
-    
-    interface TeamProgress {
-      team: Team;
-      collected: number;
-      total: number;
-      percentage: number;
-    }
     
     const progress: TeamProgress[] = game.teams.map(team => {
       const inventory = game.teamInventories[team.id] || [];
